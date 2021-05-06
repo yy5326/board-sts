@@ -19,13 +19,28 @@ public class BoardController {
 	@Autowired
 	private BoardService boardService;
 	
-	// 게시글 작성 GET
+	// 게시글 등록 GET
 	@GetMapping(value = "/board/write.do")
 	public String openBoardWrite(@RequestParam(value = "idx", required = false) Long idx, Model model) {
-		
-		model.addAttribute("board", new BoardDTO());
+	  // idx가 없으면 게시물이 생성되지 않은 상태이기 때문에,
+	  // 새로운 BoardDTO(즉, null 상태)를 모델에 담아 리턴
+	  if(idx == null) {
+	  	model.addAttribute("board", new BoardDTO());
+	  } 
+	  // idx가 있으면 게시물이 생성되어 있는 상태이기 때문에,
+	  // 게시물을 조회하고, 그 정보를 모델에 담아 리턴
+	  else {
+	  	BoardDTO board = boardService.getBoardDetail(idx);
 
-		return "board/write";
+	  // 아무 정보도 조회되지 않았다면, list로 리다이렉트
+	  	if(board == null) {
+	    	return "redirect:/board/list.do";
+	    }
+
+	    model.addAttribute("board", board);
+	  }
+
+	  return "board/write";
 	}
 	
 	// 게시글 작성 POST
@@ -56,5 +71,27 @@ public class BoardController {
 	  return "board/list";
 	}
 	
+	// 게시글 조회
+	@GetMapping(value = "/board/view.do")
+	public String openBoardDetail(@RequestParam(value = "idx", required = false) Long idx, Model model) {
+
+	  // 올바르지 않은 접근 시
+	  if(idx == null) {
+	    // => 올바르지 않은 접근이라는 메시지를 전달하고, 게시글 리스트로 리다이렉트
+	    return "redirect:/board/list.do";
+	  }
+
+	  BoardDTO board = boardService.getBoardDetail(idx);
+
+	  // 없는 게시글이거나, 이미 삭제된 게시글일 경우
+	  if(board == null || "Y".equals(board.getDeleteYn())) {
+	    // => 삭제된 게시글이라는 메시지를 전달하고, 게시글 리스트로 리다이렉트
+	    return "redirect:/board/list.do";
+	  }
+
+	  model.addAttribute("board", board);
+
+	  return "board/view";
+	}
 	
 }
