@@ -29,6 +29,11 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	//2021.04.14 thymeleaf layout 추가
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	//2021.05.06 JAR 초기화되지 않게 적용하기
+	implementation files('libs/orai18n.jar')
 }
 
 test {

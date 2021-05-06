@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.mapper.BoardMapper">
+
+<sql id="boardColumns">
+	  idx
+	, title
+	, content
+	, writer
+	, view_cnt
+	, notice_yn
+	, secret_yn
+	, delete_yn
+	, insert_time
+	, update_time
+	, delete_time
+</sql>
+
+<insert id="insertBoard" parameterType="BoardDTO">
+	insert into TB_BOARD (
+		<include refid="boardColumns" />
+	) values (
+		  TB_BOARD_SEQ.NEXTVAL
+		, #{title}
+		, #{content}
+		, #{writer}
+		, 0
+		, NVL(#{noticeYn, jdbcType=VARCHAR}, 'N')
+		, NVL(#{secretYn, jdbcType=VARCHAR}, 'N')
+		, 'N'
+		, sysdate
+		, null
+		, null
+	)
+</insert>
+
+<!-- 2. 게시글 목록 -->
+<select id="selectBoardList" parameterType="BoardDTO" resultType="BoardDTO">
+  SELECT
+  	<include refid="boardColumns" />
+  FROM
+  	TB_Board
+  WHERE
+  	delete_yn = 'N'
+  ORDER BY
+  	notice_yn ASC,
+    idx DESC,
+    insert_time DESC
+</select>
+
+<!-- 3. 게시글 개수 -->
+<select id="selectBoardTotalCount" parameterType="BoardDTO" resultType="int">
+  SELECT
+  	COUNT(*)
+  FROM
+  	tb_board
+  WHERE
+  	 delete_yn = 'N'
+</select>
+
+
+</mapper>
